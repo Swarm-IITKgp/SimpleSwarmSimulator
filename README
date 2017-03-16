@@ -1,0 +1,4 @@
+To compile Simulator :
+
+g++ -std=c++11 Simluator.cpp -o Simulator
+
