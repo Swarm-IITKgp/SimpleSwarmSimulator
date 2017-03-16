@@ -3,6 +3,8 @@
 
 #include <bits/stdc++.h>
 
+using namespace std;
+
 class SwarmBot{
  public :
   int BotID;
@@ -33,4 +35,24 @@ class SwarmBot{
   }
 };
 
+void writeSwarmBot(SwarmBot v){
+  fstream fs;
+  fs.open("POSE.txt",ios::app);
+  fs.write((char*)&v,sizeof(SwarmBot));
+  fs.close();
+}
+
+
+vector<SwarmBot> getSwarmBots(){
+  vector<SwarmBot> bots;
+  SwarmBot v;
+  fstream fs;
+  fs.open("POSE.txt");
+  while(!fs.eof()){
+    fs.read((char*)&v,sizeof(SwarmBot));
+    bots.push_back(v);
+  }
+  fs.close();
+  return bots;
+}
 #endif

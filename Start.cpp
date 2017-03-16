@@ -36,13 +36,12 @@ void CallBackFunc(int event, int i, int j, int flags, void* userdata){
     imshow("InputWindow",A);
   }
   else if(event == EVENT_RBUTTONDOWN){
-    FILE *fp;
-    fp=fopen("POSE.dat","wb");
+    fstream fs;
     for(int t=0;t<bots.size();t++){
       SwarmBot v=bots.at(t);
-      fwrite(&v,sizeof(SwarmBot),1,fp);
+      writeSwarmBot(v);
     }
-    fclose(fp);
+    fs.close();
     exit(0);
   }
 }

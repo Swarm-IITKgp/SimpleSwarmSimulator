@@ -2,3 +2,6 @@ To compile Simulator :
 
 g++ -std=c++11 Simluator.cpp -o Simulator
 
+
+Before you run any simulatio, make sure to remove POSE.txt initially present.
+

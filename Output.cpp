@@ -40,20 +40,17 @@ void showBot(SwarmBot v){
 	
 int main(){
 
-  namedWindow("InputWindow",WINDOW_AUTOSIZE);
-  SwarmBot v;
-  
+  namedWindow("OutputWindow",WINDOW_AUTOSIZE);
+ 
   while(true){
     A=Mat(sizeX,sizeY,CV_8UC3,Scalar(0,0,0));
-    FILE *fp;
-    fp=fopen("POSE.dat","rb");
-    if(fp){
-      while(fread(&v,sizeof(SwarmBot),1,fp) != 0){
-	showBot(v);
-	imshow("InputWindow",A);
-      }   
-      fclose(fp);
+    SwarmBot v;
+    vector<SwarmBot> bots=getSwarmBots();
+    for(int i=0;i<bots.size();i++){
+      v=bots.at(i);
+      showBot(v);
     }
+    imshow("OutputWindow",A);
     waitKey(10);
   }
 }
