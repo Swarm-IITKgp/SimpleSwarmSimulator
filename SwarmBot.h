@@ -1,5 +1,5 @@
-#ifndef SWARMBOT
-#define SWARMBOT
+#ifndef SWARMBOT_H
+#define SWARMBOT_H
 
 #include <bits/stdc++.h>
 
