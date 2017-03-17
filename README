@@ -1,13 +1,37 @@
-To compile Simulator :
+BRIEF OVERVIEW/ FEATURES :
+1. Infinite arena, but visible arena is 600x600, in 1st quadrant.
+2. 
 
-g++ -std=c++11 -pthread Simulator.cpp -o Simulator
 
-To compile everything else:
-make Start
-make test (When other algorithms are ready, make <<algo_name>>)
-make Output
+DEMO :
 
-Before you run any simulatio, make sure to remove POSE.txt initially present.
+The demo makes the even numbered bots to move forward and the odd numbered ones move backward.
 
-APIs will be posted later.
+BUILDING THE DEMO :
 
+1. Clone the repo. and cd into the cloned directory.
+2. Run the following commands
+   `make Start`
+   `make Output`
+   `g++ -std=c++11 -pthread Simulator.cpp -o Simulator`
+   `make test`
+3. Run the Simulator
+   `./Simulator test`
+
+TO USE IT IN YOUR ALGORITHM :
+
+1. Place your algorithm file in the cloned directory.
+
+2. Write these atop your cpp file:
+   #include "Communications.h"
+   #include "Motion.h"
+   
+3. Functions APIs as of now :
+   a. forward(int BotID,int time_in_ms=10)
+   b. backward(int BotID,int time_in_ms=10)
+   c. right(int BotID,int time_in_ms=10)
+   d. left(int BotID,int time_in_ms=10)
+
+   The maximum time for any function call is 10ms.
+
+   

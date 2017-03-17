@@ -12,10 +12,12 @@ vector<SwarmBot> getAllPose(){
   fstream fs;
   fs.open("POSE.txt");
   while(!fs.eof()){
-    fs>>v.BotID>>v.x>>v.y>>v.theta>>v.RPM;
+    fs.read((char*)&v,sizeof(SwarmBot));
     bots.push_back(v);
   }
+  fs.close();
   return bots;
+
 }
 
 #endif
