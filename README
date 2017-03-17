@@ -1,7 +1,13 @@
 To compile Simulator :
 
-g++ -std=c++11 Simluator.cpp -o Simulator
+g++ -std=c++11 -pthread Simulator.cpp -o Simulator
 
+To compile everything else:
+make Start
+make test (When other algorithms are ready, make <<algo_name>>)
+make Output
 
 Before you run any simulatio, make sure to remove POSE.txt initially present.
+
+APIs will be posted later.
 

@@ -7,14 +7,14 @@
 using namespace std;
 
 vector<SwarmBot> getAllPose(){
-  FILE *fp;
-  vector<SwarmBot>bots;
-  fp=fopen("POSE.dat","rb");
+  vector<SwarmBot> bots;
   SwarmBot v;
-  while(fread(&v,sizeof(SwarmBot),1,fp) != 0){
+  fstream fs;
+  fs.open("POSE.txt");
+  while(!fs.eof()){
+    fs>>v.BotID>>v.x>>v.y>>v.theta>>v.RPM;
     bots.push_back(v);
   }
-  fclose();
   return bots;
 }
 
