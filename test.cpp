@@ -13,11 +13,8 @@ int main(int argcs, char** argv){
   vector<SwarmBot>bots;
   BOT_ID=atoi(argv[1]);
   while(true){
-    bots=getAllPose();
-    if(BOT_ID%2 ==0)
-      forward(BOT_ID);
-    else
-      backward(BOT_ID);
+		 bots=getAllPose();
+     move(BOT_ID, 10, 75.0, 50.0);
   }
   return 0;
   
