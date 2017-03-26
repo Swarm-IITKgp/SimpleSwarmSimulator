@@ -8,6 +8,7 @@
 //Remember this also includes a constant factor for conversion of RPM to rotations per milisecond.
 #define WHEEL_RADIUS_CONSTANT 0.001
 #define PI 3.14159
+#define THRESHOLD 60.0
 
 //10% error, unlike me, pretty accurate :P
 float ERROR_PERCENTAGE=0.1;
@@ -205,5 +206,81 @@ void move(int BotID, int t = 10, float leftRPM = 0, float rightRPM = 0) {
   fs.close();
   usleep(t*1000);
 }
+
+//moves from intial position to i,j(destination)in a straight line smoothly
+//1-x^2+0.5x^3-0.5x^4+2x^5-2x^6
+void run(int BotID, int t = 10,int i = 0,int j = 0,float MAX_RPM = 0) {
+  srand (time(NULL));
+  SwarmBot v;
+  v.BotID=-1;
+  fstream fs;
+  fs.open("POSE.txt");
+  while(!fs.eof() && v.BotID!=BotID){
+    fs.read((char*)&v,sizeof(SwarmBot));
+  }
+  
+  if(t>10) t=10;
+
+  const static float init_x = v.x;
+  const static float init_y = v.y;
+  float RPM;
+  float a;
+  
+  //slope
+  v.theta = atan2(j-init_y,i - init_x);
+  float beta = (j-init_y)/(i - init_x);
+  float alpha = (j-v.y)/(i-v.x);
+  float threshold = min((float)THRESHOLD,sqrt(pow(i - init_x,2) + pow(j - init_y,2))/2);
+  
+  float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+  if( (sqrt(pow(v.x - i,2) + pow(v.y - j,2))) < 10 || alpha*beta<0)
+    RPM = 0;
+  //acceleration
+  else if( (sqrt(pow(v.x - init_x,2) + pow(v.y - init_y,2))) < threshold && (sqrt(pow(v.x - i,2) + pow(v.y - j,2))) > threshold ){
+    a = (sqrt(pow(v.x - init_x,2) + pow(v.y - init_y,2)))/threshold;
+    float asqr = pow(a,2);
+    float acube = asqr * a;
+    float afour = acube * a;
+
+    RPM = (1 -asqr + 0.5 * acube - 0.5 * afour + 2 * afour * a - 2 * afour * asqr ) * MAX_RPM + 5;
+  }
+  //constant velocity
+  else if((sqrt(pow(v.x - init_x,2) + pow(v.y - init_y,2))) > threshold && (sqrt(pow(v.x - i,2) + pow(v.y - j,2))) > threshold ){
+    RPM = MAX_RPM;
+  }
+  //deceleration
+  else if((sqrt(pow(v.x - init_x,2) + pow(v.y - init_y,2))) > threshold && (sqrt(pow(v.x - i,2) + pow(v.y - j,2)) < threshold)){ 
+    a = (sqrt(pow(v.x - i,2) + pow(v.y - j,2)))/threshold; 
+    float asqr = pow(a,2);
+    float acube = asqr * a;
+    float afour = acube * a;
+
+    RPM = (1 -asqr + 0.5 * acube - 0.5 * afour + 2 * afour * a - 2 * afour * asqr) * MAX_RPM;
+   }
+  
+  float velLeft = RPM * WHEEL_RADIUS_CONSTANT;
+  float velRight = RPM * WHEEL_RADIUS_CONSTANT;
+
+  float del_x = velLeft * t * cos(v.theta);
+  float del_y = velRight * t * sin(v.theta);
+
+  //print velocites
+  //cout<<velLeft * 1000<<endl;
+    
+  r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+  del_x += (del_x * fmod(r, ERROR_PERCENTAGE));
+
+  v.x += del_x;
+  r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+  del_y += (del_y * fmod(r, ERROR_PERCENTAGE));
+  v.y += del_y;
+
+  long pos = fs.tellp();
+  fs.seekp(pos - sizeof(SwarmBot), ios::beg);
+  fs.write((char*)&v, sizeof(SwarmBot));
+  fs.close();
+  usleep(t*1000);
+}
+
 
 #endif
