@@ -206,4 +206,173 @@ void move(int BotID, int t = 10, float leftRPM = 0, float rightRPM = 0) {
   usleep(t*1000);
 }
 
+
+//right turn at point (i,j) with radius R 
+void rightTurn(int BotID,int t=10,int i=0,int j=0,float R=0,float MAX_RPM=0){
+  srand (time(NULL));
+  SwarmBot v;
+  v.BotID=-1;
+  fstream fs;
+  fs.open("POSE.txt");
+  while(!fs.eof() && v.BotID!=BotID){
+    fs.read((char*)&v,sizeof(SwarmBot));
+  }
+  if(t>10)
+    t=10;
+ 
+  const static float x = v.x;
+  const static float y = v.y;
+  const static float theta = atan2(j-v.y,i-v.x)+2*PI*(atan2(j-v.y,i-v.x)<0) ;
+  const static float threshold = 25;
+  static float vel;
+  static int phase=1;
+  //phase=1 : accelerating phase + straight line motion before taking the turn
+  //phase=2 : taking the turn
+  //phase=3 : straight line motion after taking the turn
+  float RPM;
+  float r;
+  float theta1 = atan2(j-v.y,i-v.x);
+  float dist1 = sqrt( pow(v.x-x ,2) + pow(v.y-y ,2) ); 
+  float dist2 = sqrt( pow(v.x-i ,2) + pow(v.y-j ,2) ); 
+  
+  if( (phase==2) && ((v.theta-theta) > PI/2 || dist2>R) )
+  	phase=3; 
+  
+  if((dist2>R && phase==1) || phase == 3) {
+  	if(phase == 1)
+  	  v.theta=theta;
+  	else{
+  	  v.theta=theta+PI/2;
+ 	  v.theta -= 2*PI*(v.theta>2*PI);
+  	}
+  	
+  	if(dist1<threshold){
+      float a = dist1/threshold;
+      RPM = (3*pow(a,2)-2*pow(a,3))*MAX_RPM+5;
+  	}
+  	else
+      RPM = MAX_RPM;
+    	
+  	vel = RPM * WHEEL_RADIUS_CONSTANT;
+	float delta_x = vel * t * cos(v.theta);
+	float delta_y = vel * t * sin(v.theta);
+    
+	r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	delta_x += (delta_x * fmod(r, ERROR_PERCENTAGE));
+	v.x += delta_x;
+	
+	r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	delta_y += (delta_y * fmod(r, ERROR_PERCENTAGE));
+	v.y += delta_y;
+  }
+  else if( dist2 < R && phase != 3) {
+    //rotate in a quarter circle
+	float angVel = vel/R;
+	float delta_theta = +1 * angVel * t;
+	delta_theta += (delta_theta * (fmod(r,ERROR_PERCENTAGE)));		
+	v.theta += delta_theta;
+	v.theta -= 2*PI*(v.theta > 2*PI);
+	
+	float delta_x = vel * t * cos(v.theta);
+	float delta_y = vel * t * sin(v.theta);
+    
+	r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	delta_x += (delta_x * fmod(r, ERROR_PERCENTAGE));
+	v.x += delta_x;
+	
+	r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	delta_y += (delta_y * fmod(r, ERROR_PERCENTAGE));
+	v.y += delta_y;
+	phase=2;
+  }
+  long pos=fs.tellp();
+  fs.seekp(pos-sizeof(SwarmBot),ios::beg);
+  fs.write((char*)&v,sizeof(SwarmBot));
+  fs.close();
+  usleep(t*1000);
+}
+
+//left turn at point (i,j) with radius R
+void leftTurn(int BotID,int t=10,int i=0,int j=0,float R=0,float MAX_RPM=0){
+  srand (time(NULL));
+  SwarmBot v;
+  v.BotID=-1;
+  fstream fs;
+  fs.open("POSE.txt");
+  while(!fs.eof() && v.BotID!=BotID){
+    fs.read((char*)&v,sizeof(SwarmBot));
+  }
+  if(t>10)
+    t=10;
+  
+  const static float x = v.x;
+  const static float y = v.y;
+  const static float theta = atan2(j-v.y,i-v.x)+2*PI*(atan2(j-v.y,i-v.x)<0) ;
+  const static float threshold = 25;
+  static float vel;
+  static int phase=1;
+  //phase=1 : accelerating phase + straight line motion before taking the turn
+  //phase=2 : taking the turn
+  //phase=3 : straight line motion after taking the turn
+  float RPM;
+  float r;
+  float theta1 = atan2(j-v.y,i-v.x);
+  float dist1 = sqrt( pow(v.x-x ,2) + pow(v.y-y ,2) );  
+  float dist2 = sqrt( pow(v.x-i ,2) + pow(v.y-j ,2) );  
+  
+  if( (phase==2) && ((theta-v.theta) > PI/2 || dist2>R) )
+  	phase=3;
+  	
+  if( (dist2>R && phase==1) || phase == 3) {
+  	if(phase == 1)
+	  v.theta=theta;
+	else{
+      v.theta=theta-PI/2;
+	  v.theta += 2*PI*(v.theta<0);
+	}
+	
+	if(dist1<threshold){
+	  float a = dist1/threshold;
+      RPM = (3*pow(a,2)-2*pow(a,3))*MAX_RPM+5;
+	}
+	else 	
+      RPM = MAX_RPM;
+		
+	vel = RPM * WHEEL_RADIUS_CONSTANT;
+	float delta_x = vel * t * cos(v.theta);
+	float delta_y = vel * t * sin(v.theta);
+
+	r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	delta_x += (delta_x * fmod(r, ERROR_PERCENTAGE));
+	v.x += delta_x;
+	
+	r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	delta_y += (delta_y * fmod(r, ERROR_PERCENTAGE));
+	v.y += delta_y;
+  }
+  else if( dist2 < R && phase != 3)
+  {
+  	float angVel = vel/R;
+	float delta_theta = -1 * angVel * t;
+	delta_theta += (delta_theta * (fmod(r,ERROR_PERCENTAGE)));		
+	v.theta += delta_theta;
+	v.theta += 2*PI*(v.theta < 0);
+	float delta_x = vel * t * cos(v.theta);
+	float delta_y = vel * t * sin(v.theta);
+
+	r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	delta_x += (delta_x * fmod(r, ERROR_PERCENTAGE));
+	v.x += delta_x;
+	
+	r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	delta_y += (delta_y * fmod(r, ERROR_PERCENTAGE));
+	v.y += delta_y;
+	phase=2;
+  }
+  long pos=fs.tellp();
+  fs.seekp(pos-sizeof(SwarmBot),ios::beg);
+  fs.write((char*)&v,sizeof(SwarmBot));
+  fs.close();
+  usleep(t*1000);
+}
 #endif
