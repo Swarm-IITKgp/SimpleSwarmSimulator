@@ -3,3 +3,8 @@ LIBS = -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_ml -lopencv_vide
 CC = g++
 % : %.cpp
 	$(CC) $(CFLAGS) -o $@ $<  $(LIBS)
+
+clean:
+	rm -f Output
+	rm -f Simulator
+	rm -f test
