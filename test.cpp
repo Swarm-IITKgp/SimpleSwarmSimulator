@@ -2,7 +2,6 @@
 #include <bits/stdc++.h>
 #include <unistd.h>
 #include "Motion.h"
-#include "Communication.h"
 
 using namespace std;
 
