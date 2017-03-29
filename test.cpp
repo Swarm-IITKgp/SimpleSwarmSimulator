@@ -13,7 +13,7 @@ int main(int argcs, char** argv){
 	vector<SwarmBot>bots;
 	BOT_ID=atoi(argv[1]);
 	while(true){
-		bots=getAllPose();
+		bots=getSwarmBots();
 		//move(BOT_ID, 10, 75.0, 50.0);
 		run(BOT_ID,10,300,300,180);
 	}
