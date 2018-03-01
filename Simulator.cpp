@@ -23,7 +23,7 @@ int main(int argc, char** argv){
 
   system("./Start");
   if(argc>=2){
-     string s = argv[2];
+     string s = argv[1];
      if(!s.compare("dest-screen"))
        system("./dest");
      else if(!s.compare("circle")){
